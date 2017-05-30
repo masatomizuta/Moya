@@ -41,6 +41,9 @@ public enum UploadType {
     /// Upload a file.
     case file(URL)
 
+    /// Upload a data.
+    case data(Data)
+
     /// Upload "multipart/form-data"
     case multipart([MultipartFormData])
 }

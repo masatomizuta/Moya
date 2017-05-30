@@ -86,6 +86,8 @@ public extension MoyaProvider {
                     cancellableToken.innerCancellable = self.sendRequest(target, request: preparedRequest, queue: queue, progress: progress, completion: networkCompletion)
                 case .upload(.file(let file)):
                     cancellableToken.innerCancellable = self.sendUploadFile(target, request: preparedRequest, queue: queue, file: file, progress: progress, completion: networkCompletion)
+                case .upload(.data(let data)):
+                    cancellableToken.innerCancellable = self.sendUploadData(target, request: preparedRequest, queue: queue, data: data, completion: networkCompletion)
                 case .upload(.multipart(let multipartBody)):
                     guard !multipartBody.isEmpty && target.method.supportsMultipart else {
                         fatalError("\(target) is not a multipart upload target.")
@@ -200,6 +202,12 @@ private extension MoyaProvider {
 
     func sendUploadFile(_ target: Target, request: URLRequest, queue: DispatchQueue?, file: URL, progress: ProgressBlock? = nil, completion: @escaping Completion) -> CancellableToken {
         let uploadRequest = manager.upload(file, with: request)
+        let alamoRequest = target.validate ? uploadRequest.validate() : uploadRequest
+        return self.sendAlamofireRequest(alamoRequest, target: target, queue: queue, progress: progress, completion: completion)
+    }
+
+    func sendUploadData(_ target: Target, request: URLRequest, queue: DispatchQueue?, data: Data, progress: ProgressBlock? = nil, completion: @escaping Completion) -> CancellableToken {
+        let uploadRequest = manager.upload(data, with: request)
         let alamoRequest = target.validate ? uploadRequest.validate() : uploadRequest
         return self.sendAlamofireRequest(alamoRequest, target: target, queue: queue, progress: progress, completion: completion)
     }
